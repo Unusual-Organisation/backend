@@ -1,0 +1,456 @@
+openapi: 3.0.0
+info:
+  description: "This is the Unusual Organisation API documentation"
+  version: 0.2.0
+  title: Unusual Organisation API
+  contact:
+    email: jules.lasne@gmail.com
+tags:
+  - name: Authentication
+    description: Authentication routes routes
+
+paths:
+  /auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: Register a new user
+      description: ""
+      operationId: registerUser
+      requestBody:
+        description: Parameters to create a user
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterUser'
+      responses:
+        "200":
+          description: User successfully created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: The user id
+                    example: 1
+        "409":
+          description: Conflict error on registration
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: What happened
+                    example: Email taken
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: What happened
+                    example: Missing key 'email'
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Login user
+      description: ""
+      operationId: loginUser
+      requestBody:
+        description: Parameters to login
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginUser'
+      responses:
+        "200":
+          description: Login successfull
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  return:
+                    type: object
+                    properties:
+                      access_token:
+                        type: string
+                        description: To use to access any route
+                        example: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MDczNTE5OTQsIm5iZiI6MTYwNzM1MTk5NCwianRpIjoiOGI5MTI2MDAtYmQzMy00ZmM2LTkwYTMtNGM5YmU5NTRkMzAxIiwiZXhwIjoxNjA3MzUyODk0LCJpZGVudGl0eSI6eyJpZCI6MSwiZW1haWwiOiJ0ZXN0QGV4YW1wbGUub3JnIn0sImZyZXNoIjp0cnVlLCJ0eXBlIjoiYWNjZXNzIn0.VT0rUSlWN9oGd6j8jXzYntyP5T4E0W7vM2MNd-JEdv0
+                      refresh_token:
+                        type: string
+                        description: Refresh token to use when access token is expired
+                        example: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MDczNTE5OTQsIm5iZiI6MTYwNzM1MTk5NCwianRpIjoiMjkxZTIzZWItMWMzNy00ZjgxLTgwYjQtYmJjMDBiYmE5M2E4IiwiZXhwIjoxNjA5OTQzOTk0LCJpZGVudGl0eSI6eyJpZCI6MSwiZW1haWwiOiJ0ZXN0QGV4YW1wbGUub3JnIn0sInR5cGUiOiJyZWZyZXNoIn0.E-wujbyNVMzvMjvkCdC0XmWMhRpTPSrGbSDI3-pQAo4
+                      user_id:
+                        type: integer
+                        description: The user id that logged in
+                        example: 1
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: What happened
+                    example: Incorrect email or password
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: What happened
+                    example: Missing key 'email'
+  /auth/refresh:
+    post:
+      tags:
+        - Authentication
+      summary: Refreshes the access token
+      description: ""
+      operationId: refreshToken
+      security:
+        - refreshToken: []
+      responses:
+        "409":
+          description: Unauthorized error, token revoked.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    example: Token has been revoked
+                    default: Token has been revoked
+        "200":
+          description: Token successfully refreshed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                    description: The new and fresh access token
+                    example: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MDAzMjYzMjksIm5iZiI6MTYwMDMyNjMyOSwianRpIjoiZTA0ZWQ3NmMtMTcxMC00ZjQ4LWFkNzMtZDBmOTMxZTkxNzM0IiwiZXhwIjoxNjAwMzI3MjI5LCJpZGVudGl0eSI6eyJpZCI6MSwiZW1haWwiOiJmb29AZXhhbXBsZS5vcmciLCJ1c2VybmFtZSI6ImZvbyIsImlzX29ubGluZSI6MCwiZGF0ZV9sYXN0c2VlbiI6IldlZCwgMTYgU2VwIDIwMjAgMTU6Mzk6MDQgR01UIn0sImZyZXNoIjpmYWxzZSwidHlwZSI6ImFjY2VzcyJ9.dFJMy-04thKA9Q268bgQhiqLDrkqnCOCaiwHJ1XXook
+  /auth/logout:
+    post:
+      tags:
+        - Authentication
+      summary: Logout user
+      description: ""
+      operationId: logoutUser
+      security:
+        - refreshToken: [ ]
+      requestBody:
+        description: Parameters to logout
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogoutUser'
+      responses:
+        "401":
+          description: Unauthorized error, token already revoked.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    example: Token has been revoked
+                    default: Token has been revoked
+        "200":
+          description: Logout successful.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Logout successful.
+  /auth/password/forgot:
+    post:
+      summary: Request a password reset
+      description: Will always return a success, no matter the email passed. Emails will be sent only to valid email adresses in the database
+      operationId: requestPasswordReset
+      tags:
+        - Authentication
+      requestBody:
+        description: Parameters to request password reset
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  required: true
+                  example: foo@example.org
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Password reset mail sent successfully if user exists in DB
+  /auth/password/check_token:
+    post:
+      summary: Check the token validity
+      operationId: checkToken
+      tags:
+        - Authentication
+      requestBody:
+        description: Parameters to test the token
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                  required: true
+                  example: qwERg3rtyhog23mrweof5ngib4j3ktnrvwefqjskldnakms
+      responses:
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User not found.
+        "400":
+          description: Token error (Expired or bad signature)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Signature expired
+                  solution:
+                    type: string
+                    example: Request another password reset
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  email:
+                    type: string
+                    example: test@example.org
+                  message:
+                    type: string
+                    example: Reset token is correct.
+  /auth/password/reset:
+    post:
+      summary: Reset a password
+      operationId: passwordReset
+      tags:
+        - Authentication
+      requestBody:
+        description: Parameters to request password reset
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                  required: true
+                  example: g4eh6584jhrhyk7486f5ghket6u87k78u
+                password:
+                  type: string
+                  required: true
+                  example: dolphin2
+      responses:
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User not found.
+        "400":
+          description: Token error (Expired or bad signature)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Signature expired
+                  solution:
+                    type: string
+                    example: Request another password reset
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Password reset successful.
+  /auth/confirm/{token}:
+    post:
+      summary: Confirm a user with a token
+      operationId: confirmUser
+      tags:
+        - Authentication
+      parameters:
+        - name: token
+          in: path
+          required: true
+          description: The confirmation token
+          schema:
+            type: string
+      responses:
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User not found.
+        "400":
+          description: Token error (Expired or bad signature)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Signature expired
+                  solution:
+                    type: string
+                    example: Request another password reset
+        "200":
+          description: Success user confirmed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Confirmation successful
+  /auth/confirm/new:
+    post:
+      summary: Request a new confirmation email
+      description: Will always return a success, even if the user is not found or already confirmed
+      operationId: newConfirmEmail
+      tags:
+        - Authentication
+      requestBody:
+        description: Parameters to request new confirmation email
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  required: true
+                  type: string
+                  example: foo@example.org
+      responses:
+        "200":
+          description: New email sent if user in db
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: New confirmation email sent if user exists in database and isn't already confirmed
+
+components:
+  securitySchemes:
+    accessToken:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Access token
+    refreshToken:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Refresh token
+  schemas:
+    RegisterUser:
+      type: object
+      properties:
+        email:
+          type: string
+          example: foo@example.org
+        password:
+          type: string
+          example: dolphin2
+        first_name:
+          type: string
+          example: Foo
+        last_name:
+          type: string
+          example: Bar
+    LoginUser:
+      type: object
+      properties:
+        email:
+          type: string
+          example: foo@example.org
+        password:
+          type: string
+          example: dolphin2
+    LogoutUser:
+      type: object
+      properties:
+        access_token:
+          type: string
+          example: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MDAzMjYzMjksIm5iZiI6MTYwMDMyNjMyOSwianRpIjoiZTA0ZWQ3NmMtMTcxMC00ZjQ4LWFkNzMtZDBmOTMxZTkxNzM0IiwiZXhwIjoxNjAwMzI3MjI5LCJpZGVudGl0eSI6eyJpZCI6MSwiZW1haWwiOiJmb29AZXhhbXBsZS5vcmciLCJ1c2VybmFtZSI6ImZvbyIsImlzX29ubGluZSI6MCwiZGF0ZV9sYXN0c2VlbiI6IldlZCwgMTYgU2VwIDIwMjAgMTU6Mzk6MDQgR01UIn0sImZyZXNoIjpmYWxzZSwidHlwZSI6ImFjY2VzcyJ9.dFJMy-04thKA9Q268bgQhiqLDrkqnCOCaiwHJ1XXook
+          description: The access token to revoke
+        refresh_token:
+          type: string
+          example: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MDczNTE5OTQsIm5iZiI6MTYwNzM1MTk5NCwianRpIjoiMjkxZTIzZWItMWMzNy00ZjgxLTgwYjQtYmJjMDBiYmE5M2E4IiwiZXhwIjoxNjA5OTQzOTk0LCJpZGVudGl0eSI6eyJpZCI6MSwiZW1haWwiOiJ0ZXN0QGV4YW1wbGUub3JnIn0sInR5cGUiOiJyZWZyZXNoIn0.E-wujbyNVMzvMjvkCdC0XmWMhRpTPSrGbSDI3-pQAo4
+          description: The refresh token to revoke

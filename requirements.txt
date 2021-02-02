@@ -1,0 +1,14 @@
+flask==1.1.2
+flask-cors==3.0.9
+flask-jwt-extended==3.25.0
+python-dotenv==0.15.0
+redis==3.5.3
+peewee==3.14.0
+pymysql==0.10.1
+argon2-cffi==20.1.0
+cryptography==3.2.1
+celery==5.0.4
+flask_mail==0.9.1
+argon2==0.1.10
+Werkzeug==1.0.1
+itsdangerous==1.1.0
