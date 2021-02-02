@@ -32,10 +32,9 @@ paths:
               schema:
                 type: object
                 properties:
-                  id:
-                    type: integer
-                    description: The user id
-                    example: 1
+                  message:
+                    type: string
+                    example: "User created successfully."
         "409":
           description: Conflict error on registration
           content:
